@@ -5,9 +5,7 @@
   "bin": {
     "transip-dns": "bin/cli.js"
   },
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
+  "main": "bin/cli.js",
   "keywords": [],
   "author": "Mark Lagendijk <mark@lagendijk.nl>",
   "license": "MIT",
@@ -16,10 +14,11 @@
     "registry": "https://registry.npmjs.org/"
   },
   "dependencies": {
+    "chalk": "^3.0.0",
     "got": "^10.6.0",
     "lodash": "^4.17.15",
-    "node-fetch": "^2.6.0",
     "public-ip": "^4.0.0",
+    "table": "^5.4.6",
     "uuid": "^7.0.1",
     "yargs": "^15.1.0"
   }
