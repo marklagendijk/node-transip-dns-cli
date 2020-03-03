@@ -93,8 +93,8 @@ async function updateCommand(username, privateKey, domainNames, dnsNames, conten
     await api.createToken(username, privateKey);
 
     const dnsEntries = await getAllDsnEntries(domainNames);
-    const dnsEntriesToUpdate = dnsEntries.filter(entry => _.includes(dnsNames, entry.name));
-    const changedDnsEntries = dnsEntriesToUpdate.filter(entry => entry.content !== content);
+    const selectedDnsEntries = dnsEntries.filter(entry => _.includes(dnsNames, entry.name));
+    const changedDnsEntries = selectedDnsEntries.filter(entry => entry.content !== content);
 
     await Promise.all(changedDnsEntries.map(entry => api.updateSingleDns({ ...entry, content})));
 
