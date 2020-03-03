@@ -1,9 +1,9 @@
 #! /usr/bin/env node
-const fs = require('fs');
-const _ = require('lodash');
-const publicIp = require('public-ip');
-const api = require('../lib/api');
-const { printTable } = require('../lib/table');
+import fs from "fs";
+import _ from "lodash";
+import publicIp from "public-ip";
+import * as api from "../lib/api";
+import { printTable } from "../lib/table";
 
 const argv = require('yargs')
     .usage('Usage: transip-dns-cli <command>')
@@ -63,32 +63,44 @@ const argv = require('yargs')
 
 
 (async () => {
-    try{
+    try {
         const command = argv._[0];
         const username = argv.username;
         const privateKey = argv.privateKey || fs.readFileSync(argv.privateKeyFile, 'utf8');
         const domainNames = argv.domainName;
 
         await api.createToken(username, privateKey);
+        const dnsEntries = await getAllDsnEntries(domainNames);
 
         switch (command) {
-        case 'list-dns':
-            const dnsEntries = await Promise.all(domainNames.map(domainName => api.dns
-                .listAll(domainName)
-                .then(result => result.dnsEntries.map( entry => ({ domainName, ...entry })))
-            ));
-            printTable(_.flatten(dnsEntries), ['domainName', 'name', 'type', 'expire', 'content']);
-            break;
+            case 'list-dns':
+                printTable(dnsEntries, ['domainName', 'name', 'type', 'expire', 'content']);
+                break;
 
-        case 'update-dns':
-            const dnsNames = argv.dnsName;
-            const content = argv.content || await publicIp.v4();
-            break;
+            case 'update-dns':
+                const dnsNames = argv.dnsName;
+                const content = argv.content || await publicIp.v4();
+
+                const dnsEntriesToUpdate = dnsEntries.filter(entry => _.includes(dnsNames, entry.name));
+                const changedDnsEntries = dnsEntriesToUpdate.filter(entry => entry.content !== content);
+
+                await Promise.all(changedDnsEntries.map(entry => api.updateSingleDns({ ...entry, content})));
+
+                console.log('Updated the following items:');
+                printTable(changedDnsEntries, ['domainName', 'name', 'type', 'expire', 'content']);
+
+                break;
         }
-    }
-    catch(e){
+    } catch (e) {
         console.error(e);
     }
 })();
+
+async function getAllDsnEntries(domainNames) {
+    const dnsEntries = await Promise.all(domainNames.map(domainName => api.listAllDns(domainName)
+        .then(result => result.dnsEntries.map(entry => ({domainName, ...entry})))
+    ));
+    return _.flatten(dnsEntries);
+}
 
 
