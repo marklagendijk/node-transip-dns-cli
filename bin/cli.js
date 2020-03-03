@@ -65,36 +65,42 @@ const argv = require('yargs')
 (async () => {
     try {
         const command = argv._[0];
-        const username = argv.username;
         const privateKey = argv.privateKey || fs.readFileSync(argv.privateKeyFile, 'utf8');
-        const domainNames = argv.domainName;
-
-        await api.createToken(username, privateKey);
-        const dnsEntries = await getAllDsnEntries(domainNames);
 
         switch (command) {
             case 'list-dns':
-                printTable(dnsEntries, ['domainName', 'name', 'type', 'expire', 'content']);
+                await listCommand(argv.username, privateKey, argv.domainName);
                 break;
 
             case 'update-dns':
-                const dnsNames = argv.dnsName;
-                const content = argv.content || await publicIp.v4();
-
-                const dnsEntriesToUpdate = dnsEntries.filter(entry => _.includes(dnsNames, entry.name));
-                const changedDnsEntries = dnsEntriesToUpdate.filter(entry => entry.content !== content);
-
-                await Promise.all(changedDnsEntries.map(entry => api.updateSingleDns({ ...entry, content})));
-
-                console.log('Updated the following items:');
-                printTable(changedDnsEntries, ['domainName', 'name', 'type', 'expire', 'content']);
-
+                await updateCommand(argv.username, privateKey, arg.domainName, argv.dnsName, argv.content);
                 break;
         }
     } catch (e) {
         console.error(e);
     }
 })();
+
+async function listCommand(username, privateKey, domainNames){
+    await api.createToken(username, privateKey);
+
+    const dnsEntries = await getAllDsnEntries(domainNames);
+
+    printTable(dnsEntries, ['domainName', 'name', 'type', 'expire', 'content']);
+}
+
+async function updateCommand(username, privateKey, domainNames, dnsNames, content = await publicIp.v4()){
+    await api.createToken(username, privateKey);
+
+    const dnsEntries = await getAllDsnEntries(domainNames);
+    const dnsEntriesToUpdate = dnsEntries.filter(entry => _.includes(dnsNames, entry.name));
+    const changedDnsEntries = dnsEntriesToUpdate.filter(entry => entry.content !== content);
+
+    await Promise.all(changedDnsEntries.map(entry => api.updateSingleDns({ ...entry, content})));
+
+    console.log('Updated the following items:');
+    printTable(changedDnsEntries, ['domainName', 'name', 'type', 'expire', 'content']);
+}
 
 async function getAllDsnEntries(domainNames) {
     const dnsEntries = await Promise.all(domainNames.map(domainName => api.listAllDns(domainName)
