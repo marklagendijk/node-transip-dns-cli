@@ -12,6 +12,8 @@ Node.js cli tool for updating TransIP DNS entries. Supports:
     - [list-dns](#list-dns)
     - [update-dns](#update-dns)
     - [ddns-service](#ddns-service)
+- [Docker](#docker)
+  - [Docker run](#docker-run)
 
 ## Installation
 - `npm i -g transip-dns-cli`
@@ -22,7 +24,7 @@ All args can also be specified as environment variables, with the `TRANSIP_` pre
 ```bash 
 TRANSIP_USERNAME=myusername
 TRANSIP_PRIVATE_KEY=-----BEGIN PRIVATE KEY----- etc
-TRANSIP_PRIVATE_KEY_FILE=private-key.pem
+TRANSIP_PRIVATE_KEY_FILE=$(<private-key.pem)
 TRANSIP_DOMAIN_NAME=my-domain.nl
 TRANSIP_DNS_NAME=@
 TRANSIP_CONTENT=127.0.0.1
@@ -96,3 +98,14 @@ Options:
   --interval, -i        The interval at which the service runs.  [string] [default: "1h"]
 ```
 
+## Docker
+### Docker run
+```
+docker run \
+ --name transip-dns-cli \
+ --rm \
+  marklagendijk/transip-dns-cli list-dns \
+ --username="myusername" \
+ --privateKey="$(<private-key.pem)" \
+ --domainName my-domain.nl
+```
