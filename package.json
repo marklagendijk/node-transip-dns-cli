@@ -1,12 +1,18 @@
 {
   "name": "transip-dns-cli",
-  "version": "0.0.0",
-  "description": "",
+  "version": "0.9.0",
+  "description": "Node.js cli tool for updating TransIP DNS entries.",
   "bin": {
     "transip-dns": "bin/cli.js"
   },
   "main": "bin/cli.js",
-  "keywords": [],
+  "keywords": [
+    "transip",
+    "dns",
+    "ddns",
+    "dyndns",
+    "dynamic"
+  ],
   "author": "Mark Lagendijk <mark@lagendijk.nl>",
   "license": "MIT",
   "repository": "github:marklagendijk/transip-dns-cli",
@@ -17,6 +23,7 @@
     "chalk": "^3.0.0",
     "got": "^10.6.0",
     "lodash": "^4.17.15",
+    "parse-duration": "^0.1.2",
     "public-ip": "^4.0.0",
     "table": "^5.4.6",
     "uuid": "^7.0.1",

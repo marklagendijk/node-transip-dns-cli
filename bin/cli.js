@@ -2,6 +2,7 @@
 const fs = require('fs');
 const _ = require('lodash');
 const publicIp = require('public-ip');
+const parseDuration = require('parse-duration');
 const api = require("../lib/api");
 const { printTable } = require('../lib/table');
 
@@ -15,7 +16,7 @@ const argv = require('yargs')
             type: 'string'
         },
         privateKey: {
-            alias: 'privateKey',
+            alias: 'k',
             describe: 'Your TransIp privateKey.',
             type: 'string'
         },
@@ -54,15 +55,37 @@ const argv = require('yargs')
         },
         content: {
             alias: 'c',
-            describe: 'The content the DNS entries should be updated to. Uses public ip address of current machine by default.'
+            describe: 'The content the DNS entries should be updated to. Uses public ip address of current machine by default.',
+            type: 'string'
         },
         dryRun: {
-            type: 'boolean',
-            describe: 'Run with outputting which changes would be done, but without doing them.'
+            describe: 'Run with outputting which changes would be done, but without doing them.',
+            type: 'boolean'
+        }
+    })
+    .command('ddns-service', 'Keeps updating the content of one or more DNS entries of one or more domains to the public ip address of the current machine..', {
+        domainName: {
+            alias: 'd',
+            describe: 'The domain name(s) of the DNS entries.',
+            demandOption: true,
+            type: 'array'
+        },
+        dnsName: {
+            alias: 'n',
+            describe: 'The name(s) of the DNS entries.',
+            demandOption: true,
+            type: 'array'
+        },
+        interval: {
+            alias: 'i',
+            describe: 'The interval at which the service runs.',
+            default: '1h',
+            type: 'string'
         }
     })
     .demandCommand()
-    .env('TRANS_IP')
+    .env('TRANSIP')
+    .wrap(null)
     .argv;
 
 
@@ -79,6 +102,10 @@ const argv = require('yargs')
         case 'update-dns':
             await updateCommand(argv.username, privateKey, argv.domainName, argv.dnsName, argv.content, argv.dryRun);
             break;
+
+        case 'ddns-service':
+            const intervalInMs = parseDuration(argv.interval);
+            ddnsServiceCommand(argv.username, privateKey, argv.domainName, argv.dnsName, intervalInMs)
         }
     }
     catch (e) {
@@ -109,8 +136,21 @@ async function updateCommand(username, privateKey, domainNames, dnsNames, conten
         logUpdateInfo(dnsEntries, selectedDnsEntries, updatedDnsEntries, content);
     }
     else {
-       await applyUpdates(updatedDnsEntries);
+       await applyUpdates(updatedDnsEntries, content);
     }
+}
+
+function ddnsServiceCommand(username, privateKey, domainNames, dnsNames, intervalInMs){
+    const execute = async() => {
+        try {
+            await updateCommand(username, privateKey, domainNames, dnsNames);
+        }
+        catch(e){
+            console.error(e);
+        }
+    };
+    execute();
+    setInterval(execute, intervalInMs);
 }
 
 function logUpdateInfo(dnsEntries, selectedDnsEntries, updatedDnsEntries, content){
@@ -137,12 +177,14 @@ function logUpdateInfo(dnsEntries, selectedDnsEntries, updatedDnsEntries, conten
     }
 }
 
-async function applyUpdates(updatedDnsEntries){
+async function applyUpdates(updatedDnsEntries, content){
     await Promise.all(updatedDnsEntries.map(entry => api.updateSingleDns(entry)));
 
     if(updatedDnsEntries.length){
         console.log('Updated the following entries:');
         printTable(updatedDnsEntries);
+    } else {
+        console.log(`All entries did already have content: ${content}`);
     }
 }
 
