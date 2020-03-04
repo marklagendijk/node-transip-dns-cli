@@ -4,6 +4,15 @@ Node.js cli tool for updating TransIP DNS entries. Supports:
 - Updating the content of one or more DNS entries of one or more domains.
 - Running a service which updates content of one or more DNS entries of one or more domains to the public ip address of the current machine.
 
+## Table of Contents
+- [Installation](#installation)
+- [CLI Documenation](#cli-documentation)
+  - [Environment variables](#environment-variables)
+  - [Commands](#commands)
+    - [list-dns](#list-dns)
+    - [update-dns](#update-dns)
+    - [ddns-service](#ddns-service)
+
 ## Installation
 - `npm i -g transip-dns-cli`
 
