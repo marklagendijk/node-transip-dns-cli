@@ -1,4 +1,4 @@
-# transip-dns-cli
+# node-transip-dns-cli [![GitHub license](https://img.shields.io/github/license/marklagendijk/node-transip-dns-cli)](https://github.com/marklagendijk/node-transip-dns-cli/blob/master/LICENSE) [![npm](https://img.shields.io/npm/v/transip-dns-cli)](https://www.npmjs.com/package/transip-dns-cli) [![Docker Cloud Build Status](https://img.shields.io/docker/cloud/build/marklagendijk/transip-dns-cli)](https://hub.docker.com/r/marklagendijk/transip-dns-cli/builds) [![Docker Pulls](https://img.shields.io/docker/pulls/marklagendijk/transip-dns-cli)](https://hub.docker.com/r/marklagendijk/transip-dns-cli)
 Node.js cli tool for updating TransIP DNS entries. Supports:
 - Listing all DNS entries for one or more domains.
 - Updating the content of one or more DNS entries of one or more domains.
@@ -7,7 +7,7 @@ Node.js cli tool for updating TransIP DNS entries. Supports:
 ## Installation
 - `npm i -g transip-dns-cli`
 
-## Usage
+## CLI Documentation
 ### Environment variables
 All args can also be specified as environment variables, with the `TRANSIP_` prefix:
 ```bash 
