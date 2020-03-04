@@ -7,6 +7,7 @@ const api = require("../lib/api");
 const { printTable } = require('../lib/table');
 
 const argv = require('yargs')
+    .scriptName('')
     .usage('Usage: transip-dns-cli <command>')
     .options({
         username: {
