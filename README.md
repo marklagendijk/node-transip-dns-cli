@@ -6,6 +6,7 @@ Node.js cli tool for updating TransIP DNS entries. Supports:
 
 ## Table of Contents
 - [Installation](#installation)
+- [Creating your private key](#creating-your-private-key)
 - [CLI Documenation](#cli-documentation)
   - [Environment variables](#environment-variables)
   - [Commands](#commands)
@@ -18,6 +19,10 @@ Node.js cli tool for updating TransIP DNS entries. Supports:
 
 ## Installation
 - `npm i -g transip-dns-cli`
+
+# Creating your private key
+1. Go to https://www.transip.nl/cp/account/api/
+2. Create a new Key Pair. Note: the 'Whitelisted IP' must not be checked if want to do use `ddns-service`. 
 
 ## CLI Documentation
 ### Environment variables
