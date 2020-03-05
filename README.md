@@ -13,7 +13,8 @@ Node.js cli tool for updating TransIP DNS entries. Supports:
     - [update-dns](#update-dns)
     - [ddns-service](#ddns-service)
 - [Docker](#docker)
-  - [Docker run](#docker-run)
+  - [Docker Run](#docker-run)
+  - [Docker Compose](#docker-compose)
 
 ## Installation
 - `npm i -g transip-dns-cli`
@@ -96,10 +97,17 @@ Options:
   --domainName, -d      The domain name(s) of the DNS entries.  [array] [required]
   --dnsName, -n         The name(s) of the DNS entries.  [array] [required]
   --interval, -i        The interval at which the service runs.  [string] [default: "1h"]
+
+Examples:
+  list-dns --username="myusername" --privateKey="$(<private-key.pem)" --domainName="my-domain.nl"                                              List all DNS entries for the domain my-domain.nl.
+  list-dns --username="myusername" --privateKey="$(<private-key.pem)" --domainName="my-domain.nl" --domainName="my-domain2.nl"                 List all DNS entries for the domains my-domain.nl and my-domain2.nl.
+  update-dns --username="myusername" --privateKey="$(<private-key.pem)" --domainName="my-domain.nl" --dnsName="@"                              Update the content of the "@" DNS entry of "my-domain.nl" to the public ip of the current machine.
+  update-dns --username="myusername" --privateKey="$(<private-key.pem)" --domainName="my-domain.nl" --dnsName="@" --content="123.123.123.123"  Update the content of the "@" DNS entry of "my-domain.nl" to "123.123.123.123".
+  ddns-service --username="myusername" --privateKey="$(<private-key.pem)" --domainName="my-domain.nl" --dnsName="@"                            Keep updating the content of the "@" DNS entry of "my-domain.nl" to the public ip of the current machine.
 ```
 
 ## Docker
-### Docker run
+### Docker Run
 ```
 docker run \
  --name transip-dns-cli \
@@ -107,5 +115,21 @@ docker run \
   marklagendijk/transip-dns-cli list-dns \
  --username="myusername" \
  --privateKey="$(<private-key.pem)" \
- --domainName my-domain.nl
+ --domainName="my-domain.nl"
+```
+
+### Docker Compose
+`docker-compose.yaml`:
+``` yaml
+version: "3"
+services:
+  transip-dns-cli:
+    image: marklagendijk/transip-dns-cli:latest
+    restart: unless-stopped
+    environment:
+      - TRANSIP_USERNAME=marklagendijk
+      - |
+        TRANSIP_PRIVATE_KEY=-----BEGIN PRIVATE KEY-----
+        -----END PRIVATE KEY-----
+    command: ddns-service --domainName="my-domain.nl" --dnsName="@"
 ```

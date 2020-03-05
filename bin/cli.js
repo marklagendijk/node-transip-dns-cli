@@ -64,7 +64,7 @@ const argv = require('yargs')
             type: 'boolean'
         }
     })
-    .command('ddns-service', 'Keeps updating the content of one or more DNS entries of one or more domains to the public ip address of the current machine..', {
+    .command('ddns-service', 'Keeps updating the content of one or more DNS entries of one or more domains to the public ip address of the current machine.', {
         domainName: {
             alias: 'd',
             describe: 'The domain name(s) of the DNS entries.',
@@ -84,6 +84,26 @@ const argv = require('yargs')
             type: 'string'
         }
     })
+    .example(
+        'list-dns --username="myusername" --privateKey="$(<private-key.pem)" --domainName="my-domain.nl"',
+        'List all DNS entries for the domain my-domain.nl.'
+    )
+    .example(
+        'list-dns --username="myusername" --privateKey="$(<private-key.pem)" --domainName="my-domain.nl" --domainName="my-domain2.nl"',
+        'List all DNS entries for the domains my-domain.nl and my-domain2.nl.'
+    )
+    .example(
+        'update-dns --username="myusername" --privateKey="$(<private-key.pem)" --domainName="my-domain.nl" --dnsName="@"',
+        'Update the content of the "@" DNS entry of "my-domain.nl" to the public ip of the current machine.'
+    )
+    .example(
+        'update-dns --username="myusername" --privateKey="$(<private-key.pem)" --domainName="my-domain.nl" --dnsName="@" --content="123.123.123.123"',
+        'Update the content of the "@" DNS entry of "my-domain.nl" to "123.123.123.123".'
+    )
+    .example(
+        'ddns-service --username="myusername" --privateKey="$(<private-key.pem)" --domainName="my-domain.nl" --dnsName="@"',
+        'Keep updating the content of the "@" DNS entry of "my-domain.nl" to the public ip of the current machine.'
+    )
     .demandCommand()
     .env('TRANSIP')
     .wrap(null)
