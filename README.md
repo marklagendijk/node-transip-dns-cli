@@ -80,7 +80,7 @@ Example:
 transip-dns-cli list-dns \
   --username="myusername" \
   --privateKeyFile="private-key.pem" \
-   --domainName="example.nl"
+  --domainName="example.nl"
 ```
 Outputs:
 ```
