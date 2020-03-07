@@ -77,7 +77,13 @@ Options:
 ```
 Example:
 ```
-transip-dns-cli list-dns --username="myusername" --privateKeyFile="private-key.pem" --domainName="example.nl"
+transip-dns-cli list-dns \
+  --username="myusername" \
+  --privateKeyFile="private-key.pem" \
+   --domainName="example.nl"
+```
+Outputs:
+```
 ╔══════════════╤══════╤════════╤═══════╤═════════════════╗
 ║ domainName   │ name │ expire │ type  │ content         ║
 ╟──────────────┼──────┼────────┼───────┼─────────────────╢
@@ -105,7 +111,16 @@ Options:
 ```
 Example (dryRun):
 ```
-transip-dns-cli update-dns --username="myusername" --privateKeyFile="private-key.pem" --domainName="example.nl" --dnsName="@" --content="123.123.123.123" --dryRun
+transip-dns-cli update-dns \
+  --username="myusername" \
+  --privateKeyFile="private-key.pem" \
+  --domainName="example.nl" \
+  --dnsName="@" \
+  --content="123.123.123.123" \
+  --dryRun
+```
+Outputs:
+```
 All entries:
 ╔══════════════╤══════╤════════╤═══════╤═════════════════╗
 ║ domainName   │ name │ expire │ type  │ content         ║
@@ -132,7 +147,15 @@ Would update the following entries:
 ```
 Example:
 ```
-transip-dns-cli update-dns --username="myusername" --privateKeyFile="private-key.pem" --domainName="example.nl" --dnsName="@" --content="123.123.123.123"
+transip-dns-cli update-dns \
+  --username="myusername" \
+  --privateKeyFile="private-key.pem" \
+  --domainName="example.nl" \
+  --dnsName="@" \
+  --content="123.123.123.123"
+```
+Outputs:
+```
 Updated the following entries:
 ╔══════════════╤══════╤══════╤════════╤═════════════════╤═════════════════╗
 ║ domainName   │ name │ type │ expire │ oldContent      │ content         ║
@@ -159,7 +182,14 @@ Options:
 ```
 Example:
 ```
-transip-dns-cli ddns-service --username="myusername" --privateKeyFile="private-key.pem" --domainName="example.nl" --dnsName="@"
+transip-dns-cli ddns-service \
+  --username="myusername" \
+  --privateKeyFile="private-key.pem" \
+  --domainName="example.nl" \
+  --dnsName="@"
+```
+Outputs:
+```
 Updated the following entries:
 ╔══════════════╤══════╤══════╤════════╤═════════════════╤═════════════════╗
 ║ domainName   │ name │ type │ expire │ oldContent      │ content         ║
