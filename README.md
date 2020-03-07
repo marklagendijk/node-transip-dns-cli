@@ -29,9 +29,9 @@ Node.js cli tool for updating TransIP DNS entries. Supports:
 All args can also be specified as environment variables, with the `TRANSIP_` prefix:
 ```bash 
 TRANSIP_USERNAME=myusername
-TRANSIP_PRIVATE_KEY=-----BEGIN PRIVATE KEY----- etc
-TRANSIP_PRIVATE_KEY_FILE=$(<private-key.pem)
-TRANSIP_DOMAIN_NAME=my-domain.nl
+TRANSIP_PRIVATE_KEY=$(<private-key.pem)
+TRANSIP_PRIVATE_KEY_FILE=private-key.pem
+TRANSIP_DOMAIN_NAME=example.nl
 TRANSIP_DNS_NAME=@
 TRANSIP_CONTENT=127.0.0.1
 TRANSIP_DRY_RUN=true
@@ -52,6 +52,13 @@ Options:
   --username, -u        Your TransIp username.  [string] [required]
   --privateKey, -k      Your TransIp privateKey.  [string]
   --privateKeyFile, -f  Path to the file containing your TransIp privateKey.  [string]
+
+Examples:
+  list-dns --username="myusername" --privateKeyFile="private-key.pem" --domainName="example.nl"                                              List all DNS entries for the domain example.nl.
+  list-dns --username="myusername" --privateKeyFile="private-key.pem" --domainName="example.nl" --domainName="example2.nl"                   List all DNS entries for the domains example.nl and example2.nl.
+  update-dns --username="myusername" --privateKeyFile="private-key.pem" --domainName="example.nl" --dnsName="@"                              Update the content of the "@" DNS entry of "example.nl" to the public ip of the current machine.
+  update-dns --username="myusername" --privateKeyFile="private-key.pem" --domainName="example.nl" --dnsName="@" --content="123.123.123.123"  Update the content of the "@" DNS entry of "example.nl" to "123.123.123.123".
+  ddns-service --username="myusername" --privateKeyFile="private-key.pem" --domainName="example.nl" --dnsName="@"                            Keep updating the content of the "@" DNS entry of "example.nl" to the public ip of the current machine.
 ```
 
 #### list-dns
@@ -68,7 +75,17 @@ Options:
   --privateKeyFile, -f  Path to the file containing your TransIp privateKey.  [string]
   --domainName, -d      The domain name(s) of which the DNS entries should be listed.  [array] [required]
 ```
-
+Example:
+```
+transip-dns-cli list-dns --username="myusername" --privateKeyFile="private-key.pem" --domainName="example.nl"
+╔══════════════╤══════╤════════╤═══════╤═════════════════╗
+║ domainName   │ name │ expire │ type  │ content         ║
+╟──────────────┼──────┼────────┼───────┼─────────────────╢
+║ example.nl   │ *    │ 3600   │ CNAME │ @               ║
+╟──────────────┼──────┼────────┼───────┼─────────────────╢
+║ example.nl   │ @    │ 3600   │ A     │ 123.123.123.123 ║
+╚══════════════╧══════╧════════╧═══════╧═════════════════╝
+```
 #### update-dns
 ```
 transip-dns-cli update-dns
@@ -86,6 +103,43 @@ Options:
   --content, -c         The content the DNS entries should be updated to. Uses public ip address of current machine by default.  [string]
   --dryRun              Run with outputting which changes would be done, but without doing them.  [boolean]
 ```
+Example (dryRun):
+```
+transip-dns-cli update-dns --username="myusername" --privateKeyFile="private-key.pem" --domainName="example.nl" --dnsName="@" --content="123.123.123.123" --dryRun
+All entries:
+╔══════════════╤══════╤════════╤═══════╤═════════════════╗
+║ domainName   │ name │ expire │ type  │ content         ║
+╟──────────────┼──────┼────────┼───────┼─────────────────╢
+║ example.nl   │ *    │ 3600   │ CNAME │ @               ║
+╟──────────────┼──────┼────────┼───────┼─────────────────╢
+║ example.nl   │ @    │ 3600   │ A     │ 124.124.124.124 ║
+╚══════════════╧══════╧════════╧═══════╧═════════════════╝
+
+Selected entries:
+╔══════════════╤══════╤════════╤═══════╤═════════════════╗
+║ domainName   │ name │ expire │ type  │ content         ║
+╟──────────────┼──────┼────────┼───────┼─────────────────╢
+║ example.nl   │ @    │ 3600   │ A     │ 124.124.124.124 ║
+╚══════════════╧══════╧════════╧═══════╧═════════════════╝
+
+New content: 123.123.123.123
+Would update the following entries:
+╔══════════════╤══════╤══════╤════════╤═════════════════╤═════════════════╗
+║ domainName   │ name │ type │ expire │ oldContent      │ content         ║
+╟──────────────┼──────┼──────┼────────┼─────────────────┼─────────────────╢
+║ example.nl   │ @    │ A    │ 3600   │ 124.124.124.124 │ 123.123.123.123 ║
+╚══════════════╧══════╧══════╧════════╧═════════════════╧═════════════════╝
+```
+Example:
+```
+transip-dns-cli update-dns --username="myusername" --privateKeyFile="private-key.pem" --domainName="example.nl" --dnsName="@" --content="123.123.123.123"
+Updated the following entries:
+╔══════════════╤══════╤══════╤════════╤═════════════════╤═════════════════╗
+║ domainName   │ name │ type │ expire │ oldContent      │ content         ║
+╟──────────────┼──────┼──────┼────────┼─────────────────┼─────────────────╢
+║ example.nl   │ @    │ A    │ 3600   │ 124.124.124.124 │ 123.123.123.123 ║
+╚══════════════╧══════╧══════╧════════╧═════════════════╧═════════════════╝
+```
 
 #### ddns-service
 ```
@@ -101,26 +155,29 @@ Options:
   --privateKeyFile, -f  Path to the file containing your TransIp privateKey.  [string]
   --domainName, -d      The domain name(s) of the DNS entries.  [array] [required]
   --dnsName, -n         The name(s) of the DNS entries.  [array] [required]
-  --interval, -i        The interval at which the service runs.  [string] [default: "1h"]
-
-Examples:
-  list-dns --username="myusername" --privateKey="$(<private-key.pem)" --domainName="my-domain.nl"                                              List all DNS entries for the domain my-domain.nl.
-  list-dns --username="myusername" --privateKey="$(<private-key.pem)" --domainName="my-domain.nl" --domainName="my-domain2.nl"                 List all DNS entries for the domains my-domain.nl and my-domain2.nl.
-  update-dns --username="myusername" --privateKey="$(<private-key.pem)" --domainName="my-domain.nl" --dnsName="@"                              Update the content of the "@" DNS entry of "my-domain.nl" to the public ip of the current machine.
-  update-dns --username="myusername" --privateKey="$(<private-key.pem)" --domainName="my-domain.nl" --dnsName="@" --content="123.123.123.123"  Update the content of the "@" DNS entry of "my-domain.nl" to "123.123.123.123".
-  ddns-service --username="myusername" --privateKey="$(<private-key.pem)" --domainName="my-domain.nl" --dnsName="@"                            Keep updating the content of the "@" DNS entry of "my-domain.nl" to the public ip of the current machine.
+  --interval, -i        The interval at which the service runs.  [string] [default: "5m"]
+```
+Example:
+```
+transip-dns-cli ddns-service --username="myusername" --privateKeyFile="private-key.pem" --domainName="example.nl" --dnsName="@"
+Updated the following entries:
+╔══════════════╤══════╤══════╤════════╤═════════════════╤═════════════════╗
+║ domainName   │ name │ type │ expire │ oldContent      │ content         ║
+╟──────────────┼──────┼──────┼────────┼─────────────────┼─────────────────╢
+║ example.nl   │ @    │ A    │ 3600   │ 124.124.124.124 │ 123.123.123.123 ║
+╚══════════════╧══════╧══════╧════════╧═════════════════╧═════════════════╝
 ```
 
 ## Docker
 ### Docker Run
 ```
-docker run \
+sudo docker run \
  --name transip-dns-cli \
  --rm \
   marklagendijk/transip-dns-cli list-dns \
  --username="myusername" \
  --privateKey="$(<private-key.pem)" \
- --domainName="my-domain.nl"
+ --domainName="example.nl"
 ```
 
 ### Docker Compose
@@ -129,12 +186,12 @@ docker run \
 version: "3"
 services:
   transip-dns-cli:
-    image: marklagendijk/transip-dns-cli:latest
+    image: marklagendijk/transip-dns-cli
     restart: unless-stopped
     environment:
-      - TRANSIP_USERNAME=marklagendijk
+      - TRANSIP_USERNAME=myusername
       - |
         TRANSIP_PRIVATE_KEY=-----BEGIN PRIVATE KEY-----
         -----END PRIVATE KEY-----
-    command: ddns-service --domainName="my-domain.nl" --dnsName="@"
+    command: ddns-service --domainName="example.nl" --dnsName="@"
 ```

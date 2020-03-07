@@ -80,29 +80,29 @@ const argv = require('yargs')
         interval: {
             alias: 'i',
             describe: 'The interval at which the service runs.',
-            default: '1h',
+            default: '5m',
             type: 'string'
         }
     })
     .example(
-        'list-dns --username="myusername" --privateKey="$(<private-key.pem)" --domainName="my-domain.nl"',
-        'List all DNS entries for the domain my-domain.nl.'
+        'list-dns --username="myusername" --privateKeyFile="private-key.pem" --domainName="example.nl"',
+        'List all DNS entries for the domain example.nl.'
     )
     .example(
-        'list-dns --username="myusername" --privateKey="$(<private-key.pem)" --domainName="my-domain.nl" --domainName="my-domain2.nl"',
-        'List all DNS entries for the domains my-domain.nl and my-domain2.nl.'
+        'list-dns --username="myusername" --privateKeyFile="private-key.pem" --domainName="example.nl" --domainName="example2.nl"',
+        'List all DNS entries for the domains example.nl and example2.nl.'
     )
     .example(
-        'update-dns --username="myusername" --privateKey="$(<private-key.pem)" --domainName="my-domain.nl" --dnsName="@"',
-        'Update the content of the "@" DNS entry of "my-domain.nl" to the public ip of the current machine.'
+        'update-dns --username="myusername" --privateKeyFile="private-key.pem" --domainName="example.nl" --dnsName="@"',
+        'Update the content of the "@" DNS entry of "example.nl" to the public ip of the current machine.'
     )
     .example(
-        'update-dns --username="myusername" --privateKey="$(<private-key.pem)" --domainName="my-domain.nl" --dnsName="@" --content="123.123.123.123"',
-        'Update the content of the "@" DNS entry of "my-domain.nl" to "123.123.123.123".'
+        'update-dns --username="myusername" --privateKeyFile="private-key.pem" --domainName="example.nl" --dnsName="@" --content="123.123.123.123"',
+        'Update the content of the "@" DNS entry of "example.nl" to "123.123.123.123".'
     )
     .example(
-        'ddns-service --username="myusername" --privateKey="$(<private-key.pem)" --domainName="my-domain.nl" --dnsName="@"',
-        'Keep updating the content of the "@" DNS entry of "my-domain.nl" to the public ip of the current machine.'
+        'ddns-service --username="myusername" --privateKeyFile="private-key.pem" --domainName="example.nl" --dnsName="@"',
+        'Keep updating the content of the "@" DNS entry of "example.nl" to the public ip of the current machine.'
     )
     .demandCommand()
     .env('TRANSIP')
@@ -162,9 +162,14 @@ async function updateCommand(username, privateKey, domainNames, dnsNames, conten
 }
 
 function ddnsServiceCommand(username, privateKey, domainNames, dnsNames, intervalInMs){
+    let currentIpAddress = null;
     const execute = async() => {
         try {
-            await updateCommand(username, privateKey, domainNames, dnsNames);
+            const newIpAddress = await publicIp.v4();
+            if(currentIpAddress !== newIpAddress){
+                await updateCommand(username, privateKey, domainNames, dnsNames);
+                currentIpAddress = newIpAddress;
+            }
         }
         catch(e){
             console.error(e);
