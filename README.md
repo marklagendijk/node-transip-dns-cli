@@ -40,19 +40,16 @@ sudo docker run \
 ```
 
 ### Docker Compose
-`docker-compose.yaml`:
+`docker-compose.yml`:
 ``` yaml
 version: "3"
 services:
   transip-dns-cli:
     image: marklagendijk/transip-dns-cli
     restart: unless-stopped
-    environment:
-      - TRANSIP_USERNAME=myusername
-      - |
-        TRANSIP_PRIVATE_KEY=-----BEGIN PRIVATE KEY-----
-        -----END PRIVATE KEY-----
-    command: ddns-service --domainName="example.nl" --type="A"
+    volumes:
+      - ./private-key.pem:/home/node/app/private-key.pem
+    command: ddns-service --username="myusername" --privateKeyFile="private-key.pem" --domainName="example.nl" --type="A"
 ```
 
 ## CLI Documentation
