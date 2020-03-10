@@ -1,6 +1,6 @@
 {
   "name": "transip-dns-cli",
-  "version": "0.9.6",
+  "version": "1.0.0",
   "description": "Node.js cli tool for updating TransIP DNS entries.",
   "bin": {
     "transip-dns-cli": "bin/cli.js"
@@ -26,7 +26,7 @@
     "parse-duration": "^0.1.2",
     "public-ip": "^4.0.0",
     "table": "^5.4.6",
-    "uuid": "^7.0.1",
-    "yargs": "^15.1.0"
+    "uuid": "^7.0.2",
+    "yargs": "^15.3.0"
   }
 }

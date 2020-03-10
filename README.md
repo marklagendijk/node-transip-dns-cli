@@ -1,28 +1,59 @@
 # node-transip-dns-cli [![GitHub license](https://img.shields.io/github/license/marklagendijk/node-transip-dns-cli)](https://github.com/marklagendijk/node-transip-dns-cli/blob/master/LICENSE) [![npm](https://img.shields.io/npm/v/transip-dns-cli)](https://www.npmjs.com/package/transip-dns-cli) [![Docker Cloud Build Status](https://img.shields.io/docker/cloud/build/marklagendijk/transip-dns-cli)](https://hub.docker.com/r/marklagendijk/transip-dns-cli/builds) [![Docker Pulls](https://img.shields.io/docker/pulls/marklagendijk/transip-dns-cli)](https://hub.docker.com/r/marklagendijk/transip-dns-cli)
-Node.js cli tool for updating TransIP DNS entries. Supports:
+Node.js cli tool for updating [TransIP](https://www.transip.nl/) DNS entries. Supports:
+- Installing globally as cli tool
+- Running as Docker container
 - Listing all DNS entries for one or more domains.
 - Updating the content of one or more DNS entries of one or more domains.
-- Running a service which updates content of one or more DNS entries of one or more domains to the public ip address of the current machine.
+- Running a service which updates content of one or more DNS entries of one or more domains to the public IPv4 and / or IPv6 address of the current machine (DDNS).
 
 ## Table of Contents
-- [Installation](#installation)
 - [Creating your private key](#creating-your-private-key)
-- [CLI Documenation](#cli-documentation)
+- [Installation](#installation)
+  - [NPM](#npm)
+  - [Docker Run](#docker-run)
+  - [Docker Compose](#docker-compose)
+- [CLI Documentation](#cli-documentation)
   - [Environment variables](#environment-variables)
   - [Commands](#commands)
     - [list-dns](#list-dns)
     - [update-dns](#update-dns)
     - [ddns-service](#ddns-service)
-- [Docker](#docker)
-  - [Docker Run](#docker-run)
-  - [Docker Compose](#docker-compose)
-
-## Installation
-- `npm i -g transip-dns-cli`
 
 # Creating your private key
 1. Go to https://www.transip.nl/cp/account/api/
 2. Create a new Key Pair. Note: the 'Whitelisted IP' must not be checked if want to do use `ddns-service`. 
+
+## Installation
+### NPM
+1. Install Node.js 12.x or higher ([Windows](https://nodejs.org/en/download/current/) | [Linux](https://github.com/nodesource/distributions#debinstall) | [OSx](https://nodejs.org/en/download/current/)).
+2. `npm i -g transip-dns-cli`
+
+### Docker Run
+```
+sudo docker run \
+ --name transip-dns-cli \
+ --rm \
+  marklagendijk/transip-dns-cli list-dns \
+ --username="myusername" \
+ --privateKey="$(<private-key.pem)" \
+ --domainName="example.nl"
+```
+
+### Docker Compose
+`docker-compose.yaml`:
+``` yaml
+version: "3"
+services:
+  transip-dns-cli:
+    image: marklagendijk/transip-dns-cli
+    restart: unless-stopped
+    environment:
+      - TRANSIP_USERNAME=myusername
+      - |
+        TRANSIP_PRIVATE_KEY=-----BEGIN PRIVATE KEY-----
+        -----END PRIVATE KEY-----
+    command: ddns-service --domainName="example.nl" --type="A"
+```
 
 ## CLI Documentation
 ### Environment variables
@@ -33,6 +64,7 @@ TRANSIP_PRIVATE_KEY=$(<private-key.pem)
 TRANSIP_PRIVATE_KEY_FILE=private-key.pem
 TRANSIP_DOMAIN_NAME=example.nl
 TRANSIP_DNS_NAME=@
+TRANSIP_DNS_TYPE=A
 TRANSIP_CONTENT=127.0.0.1
 TRANSIP_DRY_RUN=true
 ```
@@ -42,8 +74,8 @@ TRANSIP_DRY_RUN=true
 Usage: transip-dns-cli <command>
 
 Commands:
-   list-dns     List all DNS entries for one or more domains.
-   update-dns   Updates the content of one or more DNS entries of one or more domains.
+   list-dns      List all DNS entries for one or more domains.
+   update-dns    Updates the content of one or more DNS entries of one or more domains.
    ddns-service  Keeps updating the content of one or more DNS entries of one or more domains to the public ip address of the current machine..
 
 Options:
@@ -54,11 +86,13 @@ Options:
   --privateKeyFile, -f  Path to the file containing your TransIp privateKey.  [string]
 
 Examples:
-  list-dns --username="myusername" --privateKeyFile="private-key.pem" --domainName="example.nl"                                              List all DNS entries for the domain example.nl.
-  list-dns --username="myusername" --privateKeyFile="private-key.pem" --domainName="example.nl" --domainName="example2.nl"                   List all DNS entries for the domains example.nl and example2.nl.
-  update-dns --username="myusername" --privateKeyFile="private-key.pem" --domainName="example.nl" --dnsName="@"                              Update the content of the "@" DNS entry of "example.nl" to the public ip of the current machine.
-  update-dns --username="myusername" --privateKeyFile="private-key.pem" --domainName="example.nl" --dnsName="@" --content="123.123.123.123"  Update the content of the "@" DNS entry of "example.nl" to "123.123.123.123".
-  ddns-service --username="myusername" --privateKeyFile="private-key.pem" --domainName="example.nl" --dnsName="@"                            Keep updating the content of the "@" DNS entry of "example.nl" to the public ip of the current machine.
+  list-dns --username="myusername" --privateKeyFile="private-key.pem" --domainName="example.nl"                                           List all DNS entries for the domain example.nl.
+  list-dns --username="myusername" --privateKeyFile="private-key.pem" --domainName="example.nl" --domainName="example2.nl"                List all DNS entries for the domains example.nl and example2.nl.
+  update-dns --username="myusername" --privateKeyFile="private-key.pem" --domainName="example.nl" --type="A"                              Update the content of all DNS entries with type "A" of "example.nl" to the public IPv4 address of the current machine.
+  update-dns --username="myusername" --privateKeyFile="private-key.pem" --domainName="example.nl" --type="A" --type="AAAA"                Update the content of all DNS entries with type "A" or type "AAAA" of "example.nl" to the public IPv4 or IPv6 address of the current machine.
+  update-dns --username="myusername" --privateKeyFile="private-key.pem" --domainName="example.nl" --name="@" --content="123.123.123.123"  Update the content of the "@" DNS entry of "example.nl" to "123.123.123.123".
+  ddns-service --username="myusername" --privateKeyFile="private-key.pem" --domainName="example.nl" --type="A"                            Keep updating the content of all DNS entries with type "A" of "example.nl" to the public IPv4 address of the current machine.
+  ddns-service --username="myusername" --privateKeyFile="private-key.pem" --domainName="example.nl" --type="A" --type="AAAA"              Keep updating the content of all DNS entries with type "A" or type "AAAA" of "example.nl" to the public IPv4 or IPv6 address of the current machine.
 ```
 
 #### list-dns
@@ -105,7 +139,8 @@ Options:
   --privateKey, -k      Your TransIp privateKey.  [string]
   --privateKeyFile, -f  Path to the file containing your TransIp privateKey.  [string]
   --domainName, -d      The domain name(s) of the DNS entries.  [array] [required]
-  --dnsName, -n         The name(s) of the DNS entries.  [array] [required]
+  --name, -n            The name(s) of the DNS entries.  [array]
+  --type, -t            The type(s) of the DNS entries.  [array]
   --content, -c         The content the DNS entries should be updated to. Uses public ip address of current machine by default.  [string]
   --dryRun              Run with outputting which changes would be done, but without doing them.  [boolean]
 ```
@@ -115,7 +150,7 @@ transip-dns-cli update-dns \
   --username="myusername" \
   --privateKeyFile="private-key.pem" \
   --domainName="example.nl" \
-  --dnsName="@" \
+  --type="A" \
   --content="123.123.123.123" \
   --dryRun
 ```
@@ -137,7 +172,6 @@ Selected entries:
 ║ example.nl   │ @    │ 3600   │ A     │ 124.124.124.124 ║
 ╚══════════════╧══════╧════════╧═══════╧═════════════════╝
 
-New content: 123.123.123.123
 Would update the following entries:
 ╔══════════════╤══════╤══════╤════════╤═════════════════╤═════════════════╗
 ║ domainName   │ name │ type │ expire │ oldContent      │ content         ║
@@ -151,7 +185,7 @@ transip-dns-cli update-dns \
   --username="myusername" \
   --privateKeyFile="private-key.pem" \
   --domainName="example.nl" \
-  --dnsName="@" \
+  --type="A" \
   --content="123.123.123.123"
 ```
 Outputs:
@@ -177,7 +211,8 @@ Options:
   --privateKey, -k      Your TransIp privateKey.  [string]
   --privateKeyFile, -f  Path to the file containing your TransIp privateKey.  [string]
   --domainName, -d      The domain name(s) of the DNS entries.  [array] [required]
-  --dnsName, -n         The name(s) of the DNS entries.  [array] [required]
+  --name, -n            The name(s) of the DNS entries.  [array]
+  --type, -t            The type(s) of the DNS entries.  [array]
   --interval, -i        The interval at which the service runs.  [string] [default: "5m"]
 ```
 Example:
@@ -186,7 +221,7 @@ transip-dns-cli ddns-service \
   --username="myusername" \
   --privateKeyFile="private-key.pem" \
   --domainName="example.nl" \
-  --dnsName="@"
+  --type="A"
 ```
 Outputs:
 ```
@@ -196,32 +231,4 @@ Updated the following entries:
 ╟──────────────┼──────┼──────┼────────┼─────────────────┼─────────────────╢
 ║ example.nl   │ @    │ A    │ 3600   │ 124.124.124.124 │ 123.123.123.123 ║
 ╚══════════════╧══════╧══════╧════════╧═════════════════╧═════════════════╝
-```
-
-## Docker
-### Docker Run
-```
-sudo docker run \
- --name transip-dns-cli \
- --rm \
-  marklagendijk/transip-dns-cli list-dns \
- --username="myusername" \
- --privateKey="$(<private-key.pem)" \
- --domainName="example.nl"
-```
-
-### Docker Compose
-`docker-compose.yaml`:
-``` yaml
-version: "3"
-services:
-  transip-dns-cli:
-    image: marklagendijk/transip-dns-cli
-    restart: unless-stopped
-    environment:
-      - TRANSIP_USERNAME=myusername
-      - |
-        TRANSIP_PRIVATE_KEY=-----BEGIN PRIVATE KEY-----
-        -----END PRIVATE KEY-----
-    command: ddns-service --domainName="example.nl" --dnsName="@"
 ```
