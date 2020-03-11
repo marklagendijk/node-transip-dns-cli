@@ -22,6 +22,7 @@ Node.js cli tool for updating [TransIP](https://www.transip.nl/) DNS entries. Su
 # Creating your private key
 1. Go to https://www.transip.nl/cp/account/api/
 2. Create a new Key Pair. Note: the 'Whitelisted IP' must not be checked if want to do use `ddns-service`. 
+3. Save the private key in a file, e.g. `private-key.pem`.
 
 ## Installation
 ### NPM
