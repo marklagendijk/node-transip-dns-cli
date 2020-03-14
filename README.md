@@ -54,6 +54,14 @@ services:
 ```
 
 ## CLI Documentation
+### Glossary
+- `domainName`: The domain you have registered at TransIP. 
+- `DNS entry`: Every domain has DNS configuration. This configuration consists of multiple DNS entries.
+- `name`: The name of a DNS entry. E.g. `@`, `*`, `www` or `mail`.
+- `type`: The type of a DNS entry. E.g. `A`, `AAAA`, `CNAME` etc.
+- `expire`: The expiration type of a DNS entry in seconds. E.g `3600` (1 hour).
+- `content`: The content of a DNS entry. IPv4 address for type `A` entries, IPv6 address for type `AAAA` entries, etc.
+
 ### Environment variables
 All args can also be specified as environment variables, with the `TRANSIP_` prefix:
 ```bash 
