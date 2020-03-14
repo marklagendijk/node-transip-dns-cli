@@ -13,6 +13,7 @@ Node.js cli tool for updating [TransIP](https://www.transip.nl/) DNS entries. Su
   - [Docker Run](#docker-run)
   - [Docker Compose](#docker-compose)
 - [CLI Documentation](#cli-documentation)
+  - [Glossary](#glossary)
   - [Environment variables](#environment-variables)
   - [Commands](#commands)
     - [list-dns](#list-dns)
