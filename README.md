@@ -12,6 +12,7 @@ Node.js cli tool for updating [TransIP](https://www.transip.nl/) DNS entries. Su
   - [NPM](#npm)
   - [Docker Run](#docker-run)
   - [Docker Compose](#docker-compose)
+  - [Docker Compose on Raspberry Pi](#docker-compose-on-raspberry-pi)
 - [CLI Documentation](#cli-documentation)
   - [Glossary](#glossary)
   - [Environment variables](#environment-variables)
@@ -54,7 +55,7 @@ services:
     command: ddns-service --username="myusername" --privateKeyFile="private-key.pem" --domainName="example.nl" --type="A"
 ```
 
-### Docker Compose Raspberry Pi
+### Docker Compose on Raspberry Pi
 The Docker images of the tool are automatically build via Docker Hub. Unfortunately it is currently either impossible or very hard to automatically build multi-arch Docker images via Docker Hub. Because of this the the tool is only build for the `linux/amd64` architecture.
 
 To still be able to run the tool on a Raspberry Pi, we can use the `node` image instead, and install the tool on startup:
