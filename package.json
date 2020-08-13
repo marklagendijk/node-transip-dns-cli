@@ -19,6 +19,9 @@
   "publishConfig": {
     "registry": "https://registry.npmjs.org/"
   },
+  "scripts": {
+    "lint": "prettier --write . && eslint --cache --fix ."
+  },
   "dependencies": {
     "chalk": "^3.0.0",
     "got": "^10.6.0",
@@ -28,5 +31,21 @@
     "table": "^5.4.6",
     "uuid": "^7.0.2",
     "yargs": "^15.3.0"
+  },
+  "devDependencies": {
+    "eslint": "^7.6.0",
+    "eslint-config-prettier": "^6.11.0",
+    "husky": "^4.2.5",
+    "lint-staged": "^10.2.11",
+    "prettier": "^2.0.5"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "*": "prettier --write",
+    "*.js": "eslint --cache --fix"
   }
 }

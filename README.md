@@ -1,5 +1,7 @@
 # node-transip-dns-cli [![GitHub license](https://img.shields.io/github/license/marklagendijk/node-transip-dns-cli)](https://github.com/marklagendijk/node-transip-dns-cli/blob/master/LICENSE) [![npm](https://img.shields.io/npm/v/transip-dns-cli)](https://www.npmjs.com/package/transip-dns-cli) [![Docker Cloud Build Status](https://img.shields.io/docker/cloud/build/marklagendijk/transip-dns-cli)](https://hub.docker.com/r/marklagendijk/transip-dns-cli/builds) [![Docker Pulls](https://img.shields.io/docker/pulls/marklagendijk/transip-dns-cli)](https://hub.docker.com/r/marklagendijk/transip-dns-cli)
+
 Node.js cli tool for updating [TransIP](https://www.transip.nl/) DNS entries. Supports:
+
 - Installing globally as cli tool
 - Running as Docker container
 - Listing all DNS entries for one or more domains.
@@ -7,6 +9,7 @@ Node.js cli tool for updating [TransIP](https://www.transip.nl/) DNS entries. Su
 - Running a service which updates content of one or more DNS entries of one or more domains to the public IPv4 and / or IPv6 address of the current machine (DDNS).
 
 ## Table of Contents
+
 - [Creating your private key](#creating-your-private-key)
 - [Installation](#installation)
   - [NPM](#npm)
@@ -22,16 +25,20 @@ Node.js cli tool for updating [TransIP](https://www.transip.nl/) DNS entries. Su
     - [ddns-service](#ddns-service)
 
 # Creating your private key
+
 1. Go to https://www.transip.nl/cp/account/api/
-2. Create a new Key Pair. Note: the 'Whitelisted IP' must not be checked if want to do use `ddns-service`. 
+2. Create a new Key Pair. Note: the 'Whitelisted IP' must not be checked if want to do use `ddns-service`.
 3. Save the private key in a file, e.g. `private-key.pem`.
 
 ## Installation
+
 ### NPM
+
 1. Install Node.js 12.x or higher ([Windows](https://nodejs.org/en/download/current/) | [Linux](https://github.com/nodesource/distributions#debinstall) | [OSx](https://nodejs.org/en/download/current/)).
 2. `npm i -g transip-dns-cli`
 
 ### Docker Run
+
 ```
 sudo docker run \
  --name transip-dns-cli \
@@ -43,8 +50,10 @@ sudo docker run \
 ```
 
 ### Docker Compose
+
 `docker-compose.yml`:
-``` yaml
+
+```yaml
 version: "3"
 services:
   transip-dns-cli:
@@ -56,11 +65,13 @@ services:
 ```
 
 ### Docker Compose on Raspberry Pi
+
 The Docker images of the tool are automatically build via Docker Hub. Unfortunately it is currently either impossible or very hard to automatically build multi-arch Docker images via Docker Hub. Because of this the the tool is only build for the `linux/amd64` architecture.
 
 To still be able to run the tool on a Raspberry Pi, we can use the `node` image instead, and install the tool on startup:
 `docker-compose.yml`:
-``` yaml
+
+```yaml
 version: "3"
 services:
   transip-dns-cli:
@@ -75,8 +86,10 @@ services:
 ```
 
 ## CLI Documentation
+
 ### Glossary
-- `domainName`: The domain you have registered at TransIP. 
+
+- `domainName`: The domain you have registered at TransIP.
 - `DNS entry`: Every domain has DNS configuration. This configuration consists of multiple DNS entries.
 - `name`: The name of a DNS entry. E.g. `@`, `*`, `www` or `mail`.
 - `type`: The type of DNS entry. Possbible types are `A`, `AAAA`, `CNAME`, `MX`, `NS`, `TXT`, `SRV`, `SSHFP` and `TLSA`.
@@ -84,8 +97,10 @@ services:
 - `content`: The content of a DNS entry. IPv4 address for type `A` entries, IPv6 address for type `AAAA` entries, etc.
 
 ### Environment variables
+
 All args can also be specified as environment variables, with the `TRANSIP_` prefix:
-```bash 
+
+```bash
 TRANSIP_USERNAME=myusername
 TRANSIP_PRIVATE_KEY=$(<private-key.pem)
 TRANSIP_PRIVATE_KEY_FILE=private-key.pem
@@ -97,6 +112,7 @@ TRANSIP_DRY_RUN=true
 ```
 
 ### Commands
+
 ```
 Usage: transip-dns-cli <command>
 
@@ -123,6 +139,7 @@ Examples:
 ```
 
 #### list-dns
+
 ```
 transip-dns-cli list-dns
 
@@ -136,14 +153,18 @@ Options:
   --privateKeyFile, -f  Path to the file containing your TransIp privateKey.  [string]
   --domainName, -d      The domain name(s) of which the DNS entries should be listed.  [array] [required]
 ```
+
 Example:
+
 ```
 transip-dns-cli list-dns \
   --username="myusername" \
   --privateKeyFile="private-key.pem" \
   --domainName="example.nl"
 ```
+
 Outputs:
+
 ```
 ╔══════════════╤══════╤════════╤═══════╤═════════════════╗
 ║ domainName   │ name │ expire │ type  │ content         ║
@@ -153,7 +174,9 @@ Outputs:
 ║ example.nl   │ @    │ 3600   │ A     │ 123.123.123.123 ║
 ╚══════════════╧══════╧════════╧═══════╧═════════════════╝
 ```
+
 #### update-dns
+
 ```
 transip-dns-cli update-dns
 
@@ -171,7 +194,9 @@ Options:
   --content, -c         The content the DNS entries should be updated to. Uses public ip address of current machine by default.  [string]
   --dryRun              Run with outputting which changes would be done, but without doing them.  [boolean]
 ```
+
 Example (dryRun):
+
 ```
 transip-dns-cli update-dns \
   --username="myusername" \
@@ -181,7 +206,9 @@ transip-dns-cli update-dns \
   --content="123.123.123.123" \
   --dryRun
 ```
+
 Outputs:
+
 ```
 All entries:
 ╔══════════════╤══════╤════════╤═══════╤═════════════════╗
@@ -206,7 +233,9 @@ Would update the following entries:
 ║ example.nl   │ @    │ A    │ 3600   │ 124.124.124.124 │ 123.123.123.123 ║
 ╚══════════════╧══════╧══════╧════════╧═════════════════╧═════════════════╝
 ```
+
 Example:
+
 ```
 transip-dns-cli update-dns \
   --username="myusername" \
@@ -215,7 +244,9 @@ transip-dns-cli update-dns \
   --type="A" \
   --content="123.123.123.123"
 ```
+
 Outputs:
+
 ```
 Updated the following entries:
 ╔══════════════╤══════╤══════╤════════╤═════════════════╤═════════════════╗
@@ -226,6 +257,7 @@ Updated the following entries:
 ```
 
 #### ddns-service
+
 ```
 transip-dns-cli ddns-service
 
@@ -242,7 +274,9 @@ Options:
   --type, -t            The type(s) of the DNS entries.  [array]
   --interval, -i        The interval at which the service runs.  [string] [default: "5m"]
 ```
+
 Example:
+
 ```
 transip-dns-cli ddns-service \
   --username="myusername" \
@@ -250,7 +284,9 @@ transip-dns-cli ddns-service \
   --domainName="example.nl" \
   --type="A"
 ```
+
 Outputs:
+
 ```
 Updated the following entries:
 ╔══════════════╤══════╤══════╤════════╤═════════════════╤═════════════════╗
