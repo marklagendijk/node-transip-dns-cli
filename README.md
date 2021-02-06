@@ -38,6 +38,7 @@ Node.js cli tool for updating [TransIP](https://www.transip.nl/) DNS entries. Su
 2. `npm i -g transip-dns-cli`
 
 ### Docker Run
+Note: the Docker image is a multiarch image. So it will also work on Raspberry Pi's.
 
 ```
 sudo docker run \
