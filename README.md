@@ -116,6 +116,7 @@ Examples:
   update-dns --username="myusername" --privateKeyFile="private-key.pem" --domainName="example.nl" --name="@" --content="123.123.123.123"  Update the content of the "@" DNS entry of "example.nl" to "123.123.123.123".
   ddns-service --username="myusername" --privateKeyFile="private-key.pem" --domainName="example.nl" --type="A"                            Keep updating the content of all DNS entries with type "A" of "example.nl" to the public IPv4 address of the current machine.
   ddns-service --username="myusername" --privateKeyFile="private-key.pem" --domainName="example.nl" --type="A" --type="AAAA"              Keep updating the content of all DNS entries with type "A" or type "AAAA" of "example.nl" to the public IPv4 or IPv6 address of the current machine.
+  ddns-service --username="myusername" --privateKeyFile="private-key.pem" --domainName="example.nl" --name="foo" --type="A"               Keep updating the content of all DNS entries with type "A" of "foo.example.nl" to the public IPv4 address of the current machine.
 ```
 
 #### list-dns
