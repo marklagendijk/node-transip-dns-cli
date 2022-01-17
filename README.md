@@ -243,6 +243,7 @@ Updated the following entries:
 transip-dns-cli ddns-service
 
 Keeps updating the content of one or more DNS entries of one or more domains to the public ip address of the current machine..
+DNS entries will only be updated when the current public IP address does not match the in memory stored public IP address.
 
 Options:
   --help                Show help  [boolean]
