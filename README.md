@@ -1,6 +1,6 @@
 # node-transip-dns-cli [![GitHub license](https://img.shields.io/github/license/marklagendijk/node-transip-dns-cli)](https://github.com/marklagendijk/node-transip-dns-cli/blob/master/LICENSE) [![npm](https://img.shields.io/npm/v/transip-dns-cli)](https://www.npmjs.com/package/transip-dns-cli) [![Docker Pulls](https://img.shields.io/docker/pulls/marklagendijk/transip-dns-cli)](https://hub.docker.com/r/marklagendijk/transip-dns-cli)
 
-Node.js cli tool for updating [TransIP](https://www.transip.nl/) DNS entries. Supports:
+Node.js cli tool for updating [TransIP](https://www.transip.nl/) DNS entries using the TransIP REST API. Supports:
 
 - Installing globally as cli tool
 - Running as Docker container
