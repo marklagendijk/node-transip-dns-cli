@@ -4,5 +4,5 @@ COPY package*.json ./
 RUN npm ci --production
 COPY . .
 USER node
-ENTRYPOINT [ "node", "."]
+ENTRYPOINT [ "node", "index.js" ]
 CMD [ "" ]
