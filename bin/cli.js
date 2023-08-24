@@ -1,10 +1,13 @@
 #! /usr/bin/env node
-const fs = require("fs");
-const _ = require("lodash");
-const publicIp = require("public-ip");
-const parseDuration = require("parse-duration");
-const api = require("../lib/api");
-const { printTable } = require("../lib/table");
+import fs from "fs";
+import _ from "lodash";
+import yargs from "yargs";
+import { hideBin } from "yargs/helpers";
+import { publicIpv4, publicIpv6 } from "public-ip";
+import parseDuration from "parse-duration";
+import api from "../lib/api.js";
+import { printTable } from "../lib/table.js";
+
 const entryTableOptions = {
   columns: ["domainName", "name", "type", "expire", "content"],
 };
@@ -12,7 +15,7 @@ const entryUpdateTableOptions = {
   columns: ["domainName", "name", "type", "expire", "oldContent", "content"],
 };
 
-const argv = require("yargs")
+const argv = yargs(hideBin(process.argv))
   .scriptName("")
   .usage("Usage: transip-dns-cli <command>")
   .options({
@@ -36,7 +39,7 @@ const argv = require("yargs")
   .check((argv) => {
     if (!argv.privateKey && !argv.privateKeyFile) {
       throw new Error(
-        "Missing required argument: privateKey or privateKeyFile."
+        "Missing required argument: privateKey or privateKeyFile.",
       );
     }
     return true;
@@ -80,7 +83,7 @@ const argv = require("yargs")
           "Run with outputting which changes would be done, but without doing them.",
         type: "boolean",
       },
-    }
+    },
   )
   .command(
     "ddns-service",
@@ -108,35 +111,35 @@ const argv = require("yargs")
         default: "5m",
         type: "string",
       },
-    }
+    },
   )
   .example(
     'list-dns --username="myusername" --privateKeyFile="private-key.pem" --domainName="example.nl"',
-    "List all DNS entries for the domain example.nl."
+    "List all DNS entries for the domain example.nl.",
   )
   .example(
     'list-dns --username="myusername" --privateKeyFile="private-key.pem" --domainName="example.nl" --domainName="example2.nl"',
-    "List all DNS entries for the domains example.nl and example2.nl."
+    "List all DNS entries for the domains example.nl and example2.nl.",
   )
   .example(
     'update-dns --username="myusername" --privateKeyFile="private-key.pem" --domainName="example.nl" --type="A"',
-    'Update the content of all DNS entries with type "A" of "example.nl" to the public IPv4 address of the current machine.'
+    'Update the content of all DNS entries with type "A" of "example.nl" to the public IPv4 address of the current machine.',
   )
   .example(
     'update-dns --username="myusername" --privateKeyFile="private-key.pem" --domainName="example.nl" --type="A" --type="AAAA"',
-    'Update the content of all DNS entries with type "A" or type "AAAA" of "example.nl" to the public IPv4 or IPv6 address of the current machine.'
+    'Update the content of all DNS entries with type "A" or type "AAAA" of "example.nl" to the public IPv4 or IPv6 address of the current machine.',
   )
   .example(
     'update-dns --username="myusername" --privateKeyFile="private-key.pem" --domainName="example.nl" --name="@" --content="123.123.123.123"',
-    'Update the content of the "@" DNS entry of "example.nl" to "123.123.123.123".'
+    'Update the content of the "@" DNS entry of "example.nl" to "123.123.123.123".',
   )
   .example(
     'ddns-service --username="myusername" --privateKeyFile="private-key.pem" --domainName="example.nl" --type="A"',
-    'Keep updating the content of all DNS entries with type "A" of "example.nl" to the public IPv4 address of the current machine.'
+    'Keep updating the content of all DNS entries with type "A" of "example.nl" to the public IPv4 address of the current machine.',
   )
   .example(
     'ddns-service --username="myusername" --privateKeyFile="private-key.pem" --domainName="example.nl" --type="A" --type="AAAA"',
-    'Keep updating the content of all DNS entries with type "A" or type "AAAA" of "example.nl" to the public IPv4 or IPv6 address of the current machine.'
+    'Keep updating the content of all DNS entries with type "A" or type "AAAA" of "example.nl" to the public IPv4 or IPv6 address of the current machine.',
   )
   .demandCommand()
   .env("TRANSIP")
@@ -161,7 +164,7 @@ const argv = require("yargs")
           argv.name,
           argv.type,
           argv.content,
-          argv.dryRun
+          argv.dryRun,
         );
         break;
 
@@ -172,7 +175,7 @@ const argv = require("yargs")
           argv.domainName,
           argv.name,
           argv.type,
-          parseDuration(argv.interval)
+          parseDuration(argv.interval),
         );
     }
   } catch (e) {
@@ -195,7 +198,7 @@ async function updateCommand(
   names,
   types,
   content,
-  dryRun
+  dryRun,
 ) {
   await api.createToken(username, privateKey);
 
@@ -203,7 +206,7 @@ async function updateCommand(
   const selectedDnsEntries = filterDnsEntries(dnsEntries, names, types);
   const dnsEntryUpdates = await createDnsEntryUpdates(
     selectedDnsEntries,
-    content
+    content,
   );
 
   if (dryRun) {
@@ -219,12 +222,12 @@ function ddnsServiceCommand(
   domainNames,
   names,
   types,
-  intervalInMs
+  intervalInMs,
 ) {
   let currentIpAddress = null;
   const execute = async () => {
     try {
-      const newIpAddress = await publicIp.v4();
+      const newIpAddress = await publicIpv4();
       if (currentIpAddress !== newIpAddress) {
         await updateCommand(username, privateKey, domainNames, names, types);
         currentIpAddress = newIpAddress;
@@ -246,7 +249,7 @@ function logUpdateInfo(dnsEntries, selectedDnsEntries, dnsEntryUpdates) {
     printTable(selectedDnsEntries, entryTableOptions);
   } else {
     console.log(
-      "There are no selected entries. Did you specify the correct name(s) and / or type(s)?"
+      "There are no selected entries. Did you specify the correct name(s) and / or type(s)?",
     );
   }
 
@@ -264,9 +267,9 @@ async function getAllDsnEntries(domainNames) {
       api
         .listAllDns(domainName)
         .then((result) =>
-          result.dnsEntries.map((entry) => ({ domainName, ...entry }))
-        )
-    )
+          result.dnsEntries.map((entry) => ({ domainName, ...entry })),
+        ),
+    ),
   );
   return _.flatten(dnsEntries);
 }
@@ -275,7 +278,7 @@ function filterDnsEntries(dnsEntries, names, types) {
   return dnsEntries.filter(
     (entry) =>
       (_.isEmpty(names) || _.includes(names, entry.name)) &&
-      (_.isEmpty(types) || _.includes(types, entry.type))
+      (_.isEmpty(types) || _.includes(types, entry.type)),
   );
 }
 
@@ -302,7 +305,7 @@ function getContent(entry, content, publicIpAddresses) {
     return publicIpAddresses.v6;
   } else {
     throw Error(
-      `Cannot update entry "${entry.name}" of type "${entry.type}". Parameter content was not specified.`
+      `Cannot update entry "${entry.name}" of type "${entry.type}". Parameter content was not specified.`,
     );
   }
 }
@@ -310,17 +313,17 @@ function getContent(entry, content, publicIpAddresses) {
 async function resolvePublicIpAddresses(dnsEntries) {
   const resolvedPublicIps = {};
   if (_.some(dnsEntries, (entry) => entry.type === "A")) {
-    resolvedPublicIps.v4 = await publicIp.v4();
+    resolvedPublicIps.v4 = await publicIpv4();
   }
   if (_.some(dnsEntries, (entry) => entry.type === "AAAA")) {
-    resolvedPublicIps.v6 = await publicIp.v6();
+    resolvedPublicIps.v6 = await publicIpv6();
   }
   return resolvedPublicIps;
 }
 
 async function applyUpdates(dnsEntryUpdates) {
   await Promise.all(
-    dnsEntryUpdates.map((update) => api.updateSingleDns(update))
+    dnsEntryUpdates.map((update) => api.updateSingleDns(update)),
   );
 
   if (dnsEntryUpdates.length) {
