@@ -1,6 +1,6 @@
 {
   "name": "transip-dns-cli",
-  "version": "2.0.7",
+  "version": "2.0.8",
   "description": "Node.js cli tool for updating TransIP DNS entries.",
   "bin": {
     "transip-dns-cli": "bin/cli.js"
