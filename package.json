@@ -21,8 +21,7 @@
     "registry": "https://registry.npmjs.org/"
   },
   "scripts": {
-    "lint": "prettier --write . && eslint --cache --fix .",
-    "prepare": "husky install"
+    "lint": "prettier --write . && eslint --cache --fix ."
   },
   "dependencies": {
     "chalk": "^5.3.0",
